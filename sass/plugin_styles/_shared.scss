@@ -3,6 +3,9 @@
 	img, object, embed {
 		max-width: none;
 	}
+	div {
+		@include vendorize(box-sizing, content-box);
+	}
 }
 
 #main article {

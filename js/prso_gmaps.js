@@ -1,78 +1,104 @@
-(function(){
+/**
+* prso_gmaps.js
+* 
+* The core script to init google maps, set markers, add info windows
+* as well as handle any external actions from the #prso-gmaps-actions dom container
+* 
+* NOTE:: 	All marker place data is passed via localized json object 'prsoGmapPlaces'
+*			All map init options are passed via json object 'prsoGmapOptions'
+*
+* @param	Object	prsoGmapPlaces
+* @param	Object	prsoGmapOptions
+* @access 	public
+* @author	Ben Moody
+*/
+
+jQuery(document).ready(function($){
 	
 	//Init vars
-	var infoWindow; //Global to hold InfoWindow object
-	var mapCanvas = 'prso-gmaps-map'; //Gmaps map canvas ID
+	var infoWindow; 										//Global to hold InfoWindow object
+	var mapCanvas 			= prsoGmapOptions.canvasID; 	//Gmaps map canvas ID
+	var places				= prsoGmapPlaces; 				//Cache places passed via wp_locallize_script
+	var placeMarkerCache 	= []; 							//Create place marker array used to open infowindows externally
+	var infoWindow;											//Create var for infoWindow object
 	
+	//Create object literal with map options
+	var options = {
+		zoom: prsoGmapOptions.zoom,
+		center: new google.maps.LatLng(prsoGmapOptions.center.lat, prsoGmapOptions.center.lng),
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
 	
+	//Create the map
+	var map = new google.maps.Map( document.getElementById(mapCanvas) );
 	
-	//Init on window load
-	window.onload = function() {
+	//Create LatLngBounds object
+	var bounds = new google.maps.LatLngBounds();	
+	
+	//Loop over places object
+	$.each( places, function(placeID, place){
 		
-		//Create object literal with map options
-		var options = {
-			zoom: 3,
-			center: new google.maps.LatLng(37.09, -95.71),
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
+		//Create place latlng object
+		var placeLatLng = new google.maps.LatLng(place.lat, place.lng);
 		
-		//Create the map
-		var map = new google.maps.Map( document.getElementById(mapCanvas) );
+		//Add markers
+		var marker =  new google.maps.Marker({
+			position: placeLatLng,
+			map: map,
+			title: place.title
+		});
 		
-		//Create LatLngBounds object
-		var bounds = new google.maps.LatLngBounds();
+		//Cache marker in global array - used to open infoWindow externally
+		placeMarkerCache.push( marker );
 		
-		//Create array of places
-		var places = [];
-		
-		//Add some test places
-		places.push( new google.maps.LatLng(40.756, -73.986) );
-		places.push( new google.maps.LatLng(37.775, -122.419) );
-		places.push( new google.maps.LatLng(47.620, -122.347) );
-		places.push( new google.maps.LatLng(-22.933, -43.184) );
-		
-		//Create var for infoWindow object
-		var infoWindow;
-		
-		//Loop over places array
-		for( var i = 0; i < places.length; i++ ) {
+		//Wrap event listener in function to allow click event to remain independent
+		(function( placeID, marker ){
 			
-			//Add markers
-			var marker =  new google.maps.Marker({
-				position: places[i],
-				map: map,
-				title: 'Place number ' + i
+			//Create event listener
+			google.maps.event.addListener( marker, 'click', function(){
+				
+				//Check if we already have an info window
+				if( !infoWindow ) {
+					infoWindow = new google.maps.InfoWindow();
+				}
+				
+				//Set info window content
+				infoWindow.setContent( place.html );
+				
+				//Tie infowindow to map marker
+				infoWindow.open( map, marker );
+				
 			});
 			
-			//Wrap event listener in function to allow click event to remain independent
-			(function( i, marker ){
-				
-				//Create event listener
-				google.maps.event.addListener( marker, 'click', function(){
-					
-					//Check if we already have an info window
-					if( !infoWindow ) {
-						infoWindow = new google.maps.InfoWindow();
-					}
-					
-					//Set info window content
-					infoWindow.setContent( 'Place number ' + i );
-					
-					//Tie infowindow to map marker
-					infoWindow.open( map, marker );
-					
-				});
-				
-			})(i, marker);
-			
-			//Extend bounds of map with each place added
-			bounds.extend( places[i] );
-			
-		}
+		})(placeID, marker);
 		
-		//Adjust map bounding view
-		map.fitBounds( bounds );
+		//Extend bounds of map with each place added
+		bounds.extend( placeLatLng );
 		
+	});
+	
+	//Adjust map bounding view
+	map.fitBounds( bounds );
+	
+	//Helper to open Info Window for a specfic place marker
+	function openInfoWindow( placeMarkerID ) {
+		google.maps.event.trigger( placeMarkerCache[placeMarkerID], "click" );
 	}
 	
-})();
+	//Add listner for map external actions
+	$("#prso-gmaps-actions a").click(function(event){
+		
+		event.preventDefault();
+		
+		//Init vars
+		var placeMarkerID;
+		
+		//Cache place marker id
+		placeMarkerID = $(this).attr("rel");
+		
+		//Call function to open infowindow for selected place marker
+		openInfoWindow( placeMarkerID );
+		
+	});
+	
+});

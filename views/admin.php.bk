@@ -48,14 +48,14 @@ class PrsoGmapsAdminView extends PrsoGmapsFunctions {
  * 2. 	View Title
  *		Define a title for this view
  *****************************************************************/ 
- 	public $view_title	= 'Prso Plugin Example';
+ 	public $view_title	= 'Pressoholics Google Maps Framework';
 	
 	
 /******************************************************************
  * 3. 	View Menu Title
  *		Define a title for this view's menu item
  *****************************************************************/ 
- 	public $view_menu_title	= 'Prso Plugin Example';
+ 	public $view_menu_title	= 'Pressoholics Gmaps';
  	
 
 /******************************************************************
@@ -150,8 +150,8 @@ class PrsoGmapsAdminView extends PrsoGmapsFunctions {
  	**/
  	public $page_sections = array(
  		array(
- 			'id'	=>	'general_options',
- 			'title'	=>	'General Options'
+ 			'id'	=>	'api_options',
+ 			'title'	=>	'Gmaps API Configuration'
  		)
  	);
  
@@ -184,14 +184,7 @@ class PrsoGmapsAdminView extends PrsoGmapsFunctions {
  	*
  	**/
  	public $page_fields = array(
- 		array(
- 			'section'	=>	'general_options',
- 			'id'		=>	'input_test_html',
- 			'title'		=>	'Test Input Field',
- 			'desc'		=>	'Description for this field',
- 			'type'		=>	'text',
- 			'default'	=>	'default value'
- 		)
+ 		
  	);
 
 /******************************************************************
@@ -221,12 +214,7 @@ class PrsoGmapsAdminView extends PrsoGmapsFunctions {
  	*
  	**/
  	public $validate_fields = array(
- 		'input_test_html'	=>	array(
- 			'nice_name'	=>	'Test Field',
- 			'type'		=>	'text',
- 			'message'	=>	'Invalid Value',
- 			'empty'		=>	FALSE
- 		)
+ 		
  	);
 	
  

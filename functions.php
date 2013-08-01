@@ -21,6 +21,8 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	
 	private $view_template_path 	= '';
 	
+	private $map_data_cache			= array();
+	
 	//*** PRSO PLUGIN FRAMEWORK METHODS - Edit at your own risk (go nuts if you just want to add to them) ***//
 	
 	function __construct() {
@@ -162,6 +164,12 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		//Enqueue and scripts needed for the plugin
 		$this->enqueue_scripts();
 		
+		//Cache Map data
+		$this->get_map_data();
+		
+		//Localize map params
+		$this->localize_map_params();
+		
 		//Render view template
 		$this->render_view();
 		
@@ -198,7 +206,7 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	*
 	* Enqueues any scripts for plugin front end
 	* 
-	* @access 	public
+	* @access 	private
 	* @author	Ben Moody
 	*/
 	private function enqueue_scripts() {
@@ -234,6 +242,151 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		
 	}
 	
+	/**
+	* get_map_data
+	* 
+	* Gets any data from external sources to build map
+	*
+	* Note required data: lat, lng, content. The Content array is passed
+	* to the Info Window view template global $prso_google_maps_infowindow.
+	* This can then be used in the view or in another function to build the view html
+	* 
+	* @var		global	$prso_google_maps_main
+	* @var		array	$map_data
+	* @access 	private
+	* @author	Ben Moody
+	*/
+	private function get_map_data() {
+		
+		//Init vars
+		global $prso_google_maps_main;
+		$map_data = array();
+		
+		//Setup dummy test data
+		$map_data = array(
+			array(
+				'lat'		=>	'40.756',
+				'lng'		=>	'-73.986',
+				'title'		=> 'example title',
+				'content'	=>	array(
+									'title'	=> 'example_1'
+								)
+			),
+			array(
+				'lat'		=>	'37.775',
+				'lng'		=>	'-122.419',
+				'title'		=> 'example title',
+				'content'	=>	array(
+									'title'	=> 'example_2'
+								)
+			),
+			array(
+				'lat'		=>	'47.620',
+				'lng'		=>	'-122.347',
+				'title'		=> 'example title',
+				'content'	=>	array(
+									'title'	=> 'example_3'
+								)
+			),
+			array(
+				'lat'		=>	'-22.933',
+				'lng'		=>	'-43.184',
+				'title'		=> 'example title',
+				'content'	=>	array(
+									'title'	=> 'example_4'
+								)
+			)
+		);
+		
+		
+		//Cache data in global var
+		$this->map_data_cache = $map_data;
+		
+		//Cache data array for use within main viwe template
+		$prso_google_maps_main = $map_data;
+		
+	}
+	
+	/**
+	* localize_map_params
+	* 
+	* Loops map data ($this->map_data_cache) caching lat/lng and html content
+	* for each map marker and info window.
+	*
+	* Note:: 	For each marker the content array is cached in global $prso_google_maps_infowindow.
+	*			This can then be used either in the view template or another function to build
+	*			info window html using the data in the array.
+	*
+	* Once the content data has been parsed, the info_window_view.php view template is then included and
+	* buffered as a string to be localized along with the lat/lng params.
+	* 
+	* @var		global	$prso_google_maps_infowindow
+	* @var		array	$map_params
+	* @var		array	$marker_data
+	* @var		string	$view_path
+	* @var		array	$map_data
+	* @access 	private
+	* @author	Ben Moody
+	*/
+	private function localize_map_params() {
+		
+		//Init vars
+		global $prso_google_maps_infowindow;
+		$map_params 	= array();
+		$marker_data	= array();
+		$view_path 		= $this->view_template_path . '/info_window_view.php';
+		$map_data		= $this->map_data_cache;
+		
+		//Setup data for creating map markers/info windows
+		if( !empty($map_data) ) {
+			
+			//Cache map places LatLng and any rich content
+			foreach( $map_data as $key => $dataArray ) {
+				
+				$marker_data[$key]['lat'] 	= $dataArray['lat'];
+				$marker_data[$key]['lng'] 	= $dataArray['lng'];
+				
+				$marker_data[$key]['title'] = $dataArray['title'];
+				
+				//Set content param for view template
+				$prso_google_maps_infowindow = $dataArray['content'];
+				
+				//Cache html content
+				ob_start();
+					$this->include_file( $view_path, FALSE );
+					$marker_data[$key]['html'] 	= ob_get_contents();
+				ob_end_clean();
+				
+			}
+				
+		}
+		
+		//Setup data for map api params - get these from database?
+		$map_params = array(
+			'canvasID' 	=> 'prso-gmaps-map',
+			'zoom'		=> 3,
+			'center'	=> array(
+								'lat' => '',
+								'lng' => ''	
+							),
+			'mapType'	=> ''
+						
+		);
+		
+		//Localize params from plugin js
+		wp_localize_script( 'prso_google_maps', 'prsoGmapPlaces', $marker_data );
+		wp_localize_script( 'prso_google_maps', 'prsoGmapOptions', $map_params );
+		
+	}
+	
+	/**
+	* render_view
+	* 
+	* Simple helper to include the main view template file
+	* 
+	* @access 	private
+	* @author	Ben Moody
+	*/
 	private function render_view() {
 		
 		//Init vars
@@ -245,10 +398,28 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		
 	}
 	
-	private function include_file( $file_path ) {
+	/**
+	* include_file 
+	* 
+	* Helper to include external files
+	*
+	* Defaults to include_once, set $include_once param to TRUE to use include()
+	* 
+	* @param	string	$file_path
+	* @param	bool	$include_once
+	* @return	bool	
+	* @access 	private
+	* @author	Ben Moody
+	*/
+	private function include_file( $file_path, $include_once = TRUE ) {
 		
 		if( file_exists($file_path) ) {
-			include_once( $file_path );
+			
+			if( $include_once === TRUE ) {
+				include_once( $file_path );
+			} else {
+				include( $file_path );
+			}
 			
 			return TRUE;
 		}

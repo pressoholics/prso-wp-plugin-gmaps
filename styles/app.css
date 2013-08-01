@@ -11,14 +11,22 @@ Ex: @include rem(line-height, 25px);
 #prso-gmaps-map img, #prso-gmaps-map object, #prso-gmaps-map embed {
   max-width: none;
 }
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\000036}}
+#prso-gmaps-map div {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  -ms-box-sizing: content-box;
+  -o-box-sizing: content-box;
+  box-sizing: content-box;
+}
 
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000310}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000313}}
 #main article #prso-gmaps-map img, #main article #prso-gmaps-map object, #main article #prso-gmaps-map embed {
   max-width: none;
 }
 
 /* Gmaps Canvas */
-@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000317}}
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000320}}
 #prso-gmaps-map {
   height: 500px;
   width: 100%;
