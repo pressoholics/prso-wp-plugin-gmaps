@@ -17,6 +17,8 @@
  */
 class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	
+	private $google_maps_api_url = 'http://maps.google.com/maps/api/js';
+	
 	//*** PRSO PLUGIN FRAMEWORK METHODS - Edit at your own risk (go nuts if you just want to add to them) ***//
 	
 	function __construct() {
@@ -46,17 +48,19 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		//*** PRSO PLUGIN CORE ACTIONS ***//
 		
 		//Enqueue any custom scripts or styles
-		add_action( 'admin_init', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_init', array( $this, 'admin_enqueue_scripts' ) );
 		
 		//Add any custom actions
-		add_action( 'admin_init', array( $this, 'add_actions' ) );
+		add_action( 'admin_init', array( $this, 'admin_add_actions' ) );
 		
 		//Add any custom filter
-		add_action( 'admin_init', array( $this, 'add_filters' ) );
+		add_action( 'admin_init', array( $this, 'admin_add_filters' ) );
 		
 		
 		//*** ADD CUSTOM ACTIONS HERE ***//
-
+		
+		//Add front end actions
+		add_action( 'init', array( $this, 'add_actions' ) );
 		
 	}
 	
@@ -72,7 +76,7 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	private function save_post() {
 		
 		//Call wp function to setup saving meta box
-		add_action( 'save_post', array( $this, 'save_fields' ) );
+		//add_action( 'save_post', array( $this, 'save_fields' ) );
 		
 	}
 	
@@ -84,7 +88,8 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	* @access 	public
 	* @author	Ben Moody
 	*/
-	public function enqueue_scripts() {
+	public function admin_enqueue_scripts() {
+		
 		
 	}
 	
@@ -96,7 +101,7 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	* @access 	public
 	* @author	Ben Moody
 	*/
-	public function add_actions() {
+	public function admin_add_actions() {
 		
 	}
 	
@@ -108,7 +113,7 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	* @access 	public
 	* @author	Ben Moody
 	*/
-	public function add_filters() {
+	public function admin_add_filters() {
 		
 	}
 	
@@ -119,6 +124,99 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	
 	//*** CUSTOM METHODS SPECIFIC TO THIS PLUGIN ***//
 	
+	/**
+	* add_actions
+	* 
+	* Add any custom wp actions for the FRONT END of the plugin here
+	* 
+	* @access 	public
+	* @author	Ben Moody
+	*/
+	public function add_actions() {
+		
+		//Register custom action to init map plugin
+		add_action( 'prso_init_gmap', array( $this, 'init_gmaps' ), 10, NULL );
+		
+	}
+	
+	/**
+	* init_gmaps
+	* 
+	* Called by WP Action: 'prso_init_gmap'
+	*
+	* Calls plugin methods required to init the google map
+	* 
+	* @access 	public
+	* @author	Ben Moody
+	*/
+	public function init_gmaps() {
+
+		//Format maps api url with any options
+		$this->format_api_url_options();
+		
+		//Enqueue and scripts needed for the plugin
+		$this->enqueue_scripts();
+		
+	}
+	
+	/**
+	* format_api_url_options
+	* 
+	* Helper to add any url based options to the gmaps api url
+	* Gets options from plugin wp options page
+	* 
+	* @param	string	$this->google_maps_api_url - class global, holds base url to gmaps api
+	* @var		array	$plugin_options	- plugin options from plugin wp admin
+	* @access 	private
+	* @author	Ben Moody
+	*/
+	private function format_api_url_options() {
+		
+		//Init vars
+		$plugin_options = array();
+		
+		//TESTING ONLY PROBABLY NEED TO GRAB FROM OPTIONS
+		$plugin_options['sensor'] = "false";
+		
+		//Append any options to api url
+		$this->google_maps_api_url.= "?sensor=" . $plugin_options['sensor'];
+		
+	}
+	
+	/**
+	* init_gmaps
+	* 
+	* Called by: $this->init_gmaps()
+	*
+	* Enqueues any scripts for plugin front end
+	* 
+	* @access 	public
+	* @author	Ben Moody
+	*/
+	private function enqueue_scripts() {
+		
+		//Enqueue jQuery
+		wp_enqueue_script( 'jquery' );
+		
+		//Enqueue Google Maps API
+		wp_register_script( 'google_maps_api',
+			$this->google_maps_api_url,
+			array(),
+			'3.0',
+			TRUE
+		);
+		wp_enqueue_script( 'google_maps_api' );
+		
+		//Enqueue plugin maps script
+		wp_register_script( 'prso_google_maps',
+			plugins_url( 'js/prso_gmaps.js', PrsoGmapsConfig::$plugin_file_path ),
+			array( 'google_maps_api', 'jquery' ),
+			'1.0',
+			TRUE
+		);
+		wp_enqueue_script( 'prso_google_maps' );
+		
+	}
 	
 	/* When the post is saved, saves our custom data */
 	public function save_fields( $post_id ) {
