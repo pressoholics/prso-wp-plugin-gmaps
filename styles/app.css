@@ -1,0 +1,25 @@
+/* Custom Sass Mixins */
+/* Convert PX units to REMs and add px fallback of property.
+Ex: @include rem(line-height, 25px);
+*/
+/* Helper to add propoerty across browser vendors */
+/* Clear Fix Helper */
+/* Helper to style all Link Hover/Active/Focus */
+/* Helper to return css required for left overlap browser bars */
+/* Reset some styles */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\000033}}
+#prso-gmaps-map img, #prso-gmaps-map object, #prso-gmaps-map embed {
+  max-width: none;
+}
+
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000310}}
+#main article #prso-gmaps-map img, #main article #prso-gmaps-map object, #main article #prso-gmaps-map embed {
+  max-width: none;
+}
+
+/* Gmaps Canvas */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/Users\/ben\/Documents\/Development\/vhost\/www\.pressoholics\.dev\/wp-content\/plugins\/presso-gmaps\/sass\/plugin_styles\/_shared\.scss}line{font-family:\0000317}}
+#prso-gmaps-map {
+  height: 500px;
+  width: 100%;
+}

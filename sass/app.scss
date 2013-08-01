@@ -1,0 +1,8 @@
+// Your custom settings file to override Foundation defaults
+@import "settings";
+
+// Mixins
+@import "mixins";
+
+// Plugin specific sass
+@import "plugin_styles/_shared.scss";

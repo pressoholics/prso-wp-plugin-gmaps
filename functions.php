@@ -17,7 +17,9 @@
  */
 class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	
-	private $google_maps_api_url = 'http://maps.google.com/maps/api/js';
+	private $google_maps_api_url 	= 'http://maps.google.com/maps/api/js';
+	
+	private $view_template_path 	= '';
 	
 	//*** PRSO PLUGIN FRAMEWORK METHODS - Edit at your own risk (go nuts if you just want to add to them) ***//
 	
@@ -150,12 +152,18 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 	* @author	Ben Moody
 	*/
 	public function init_gmaps() {
-
+		
+		//Cache path to view templates
+		$this->view_template_path = $this->plugin_root . '/templates';
+		
 		//Format maps api url with any options
 		$this->format_api_url_options();
 		
 		//Enqueue and scripts needed for the plugin
 		$this->enqueue_scripts();
+		
+		//Render view template
+		$this->render_view();
 		
 	}
 	
@@ -216,6 +224,36 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		);
 		wp_enqueue_script( 'prso_google_maps' );
 		
+		//Enqueue plugin styles
+		wp_register_style( 'prso_google_maps',
+			plugins_url( 'styles/app.css', PrsoGmapsConfig::$plugin_file_path ),
+			array(),
+			'1.0'
+		);
+		wp_enqueue_style( 'prso_google_maps' );
+		
+	}
+	
+	private function render_view() {
+		
+		//Init vars
+		$view_path = NULL;
+		
+		//Include main map view
+		$view_path = $this->view_template_path . '/main_view.php';
+		$this->include_file( $view_path );
+		
+	}
+	
+	private function include_file( $file_path ) {
+		
+		if( file_exists($file_path) ) {
+			include_once( $file_path );
+			
+			return TRUE;
+		}
+		
+		return FALSE;
 	}
 	
 	/* When the post is saved, saves our custom data */
