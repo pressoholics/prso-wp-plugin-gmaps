@@ -84,8 +84,6 @@ class PrsoGmapsConfig {
 			self::$plugin_file_path = $plugin_file_path;
 		}
 		
-		$this->plugin_file_path = $plugin_file_path;
-		
 		//Set plugin views folder
 		$this->plugin_views = $this->plugin_root . '/views';
 		
