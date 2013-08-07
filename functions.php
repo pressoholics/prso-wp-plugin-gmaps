@@ -223,6 +223,15 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 		);
 		wp_enqueue_script( 'google_maps_api' );
 		
+		//Enqueue Google Maps InfoBox plugin
+		wp_register_script( 'google_maps_infobox',
+			plugins_url( 'js/gmaps.infobox.js', PrsoGmapsConfig::$plugin_file_path ),
+			array( 'google_maps_api' ),
+			'1.0',
+			TRUE
+		);
+		wp_enqueue_script( 'google_maps_infobox' );
+		
 		//Enqueue plugin maps script
 		wp_register_script( 'prso_google_maps',
 			plugins_url( 'js/prso_gmaps.js', PrsoGmapsConfig::$plugin_file_path ),
@@ -369,8 +378,8 @@ class PrsoGmapsFunctions extends PrsoGmapsAppController {
 								'lat' => '',
 								'lng' => ''	
 							),
-			'mapType'	=> ''
-						
+			'mapType'	=> '',
+			'markerImages' => plugins_url( 'images/markers', PrsoGmapsConfig::$plugin_file_path )
 		);
 		
 		//Localize params from plugin js
