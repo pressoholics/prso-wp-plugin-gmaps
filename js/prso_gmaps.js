@@ -113,9 +113,12 @@ jQuery(document).ready(function($){
 	* NOTE:: This makes use of open source InfoBox class which extends google maps
 	* REF:: http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/docs/reference.html
 	* 
-	* @param	type	name
-	* @var		type	name
-	* @return	type	name
+	* @param	infoWindow	object
+	* @param	place		object
+	* @param	marker		object
+	* @param	map			object
+	* @var		array		infoBoxOptions
+	* @return	object		infoWindow
 	* @access 	public
 	* @author	Ben Moody
 	*/
