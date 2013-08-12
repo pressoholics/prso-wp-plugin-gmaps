@@ -244,6 +244,12 @@ jQuery(document).ready(function($){
 		//Call function to open infowindow for selected place marker
 		openInfoWindow( placeMarkerID );
 		
+		//Remove active class from all action link containers
+		$("#prso-gmaps-actions li").removeClass("active");
+		
+		//Add active class to this aciton link
+		$(this).closest("li").addClass("active");
+		
 	});
 	
 });
