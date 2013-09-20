@@ -24,14 +24,13 @@ jQuery(document).ready(function($){
 	
 	//Create object literal with map options
 	var options = {
-		zoom: Number(prsoGmapOptions.zoom),
-		mapTypeControl: false,
+		zoom: prsoGmapOptions.zoom,
 		center: new google.maps.LatLng(prsoGmapOptions.center.lat, prsoGmapOptions.center.lng),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	
 	//Create the map
-	var map = new google.maps.Map( document.getElementById(mapCanvas), options );
+	var map = new google.maps.Map( document.getElementById(mapCanvas) );
 	
 	//Create LatLngBounds object
 	var bounds = new google.maps.LatLngBounds();	
@@ -61,15 +60,8 @@ jQuery(document).ready(function($){
 			//Create event listener
 			google.maps.event.addListener( marker, 'click', function(){
 				
-				var useCustomInfoWindow = true;
-				
-				//Check for ie8 as custom info windows don't work
-				if( isIE8() ) {
-					useCustomInfoWindow = false;
-				}
-				
 				//Open InfoWindow -- set last param to 'true' to use custom styled info window :)
-				infoWindow = openMarkerInfoWindow( infoWindow, place, marker, map, useCustomInfoWindow );
+				infoWindow = openMarkerInfoWindow( infoWindow, place, marker, map, false );
 				
 			});
 			
@@ -83,19 +75,8 @@ jQuery(document).ready(function($){
 	//Adjust map bounding view
 	map.fitBounds( bounds );
 	
-	//Helper to detect ie8 via modernizer class added to html element
-	function isIE8() {
-		
-		if( $('html').hasClass('ie8') ) {
-			return true;
-		} else {
-			return false;
-		}
-		
-	}
-	
 	//Helper to handle marker info window, content, and custom style (if required)
-	function openMarkerInfoWindow( infoWindow, place, marker, map, customInfoWindow ) {
+	function openMarkerInfoWindow( infoWindow, place, marker, map, customInfoWindow = false ) {
 		
 		//Check if we should call helper to generate a custom infowindow
 		if( customInfoWindow === false ) {
@@ -171,9 +152,6 @@ jQuery(document).ready(function($){
 		if( !infoWindow ) {
 			infoWindow = new InfoBox( infoBoxOptions );
 		}
-		
-		//Set window content
-		infoWindow.setContent(place.html);
 		
 		//Open info window
 		infoWindow.open( map, marker );
@@ -265,12 +243,6 @@ jQuery(document).ready(function($){
 		
 		//Call function to open infowindow for selected place marker
 		openInfoWindow( placeMarkerID );
-		
-		//Remove active class from all action link containers
-		$("#prso-gmaps-actions li").removeClass("active");
-		
-		//Add active class to this aciton link
-		$(this).closest("li").addClass("active");
 		
 	});
 	
